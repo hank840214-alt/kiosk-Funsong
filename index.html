@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>Salon Booking Kiosk</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <style>
+      /* Base Kiosk Styles */
+      body {
+        overscroll-behavior-y: contain;
+        background-color: #000;
+        user-select: none;
+        -webkit-user-select: none;
+        font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      }
+
+      /* Animations ported from React components */
+      @keyframes slow-pan {
+        0% { transform: scale(1.1) translate(0, 0); }
+        100% { transform: scale(1.2) translate(-2%, -2%); }
+      }
+      @keyframes button-breathe {
+        0%, 100% { 
+          transform: scale(1);
+          box-shadow: 0 0 0 rgba(255,255,255,0);
+        }
+        50% { 
+          transform: scale(1.03);
+          box-shadow: 0 0 30px rgba(255,255,255,0.5);
+        }
+      }
+      @keyframes button-shimmer {
+        0% { background-position: 0% 50%; }
+        100% { background-position: 200% 50%; }
+      }
+      @keyframes fade-in-up {
+        0% { opacity: 0; transform: translateY(30px); }
+        100% { opacity: 1; transform: translateY(0); }
+      }
+      @keyframes fade-in {
+        0% { opacity: 0; }
+        100% { opacity: 1; }
+      }
+
+      .animate-slow-pan {
+        animation: slow-pan 20s ease-in-out infinite alternate;
+      }
+      .animate-button-complex {
+        background-size: 200% auto;
+        animation: button-breathe 4s ease-in-out infinite, button-shimmer 6s linear infinite;
+      }
+      /* Pause animations on hover */
+      .group:hover .animate-button-complex {
+        animation-play-state: paused;
+      }
+      .animate-fade-in-up {
+        animation: fade-in-up 1s ease-out forwards;
+      }
+      .animate-fade-in {
+        animation: fade-in 1.5s ease-out forwards;
+      }
+
+      /* Utility */
+      .hidden {
+        display: none !important;
+      }
+    </style>
+<script type="importmap">
+{
+  "imports": {
+    "lucide-react": "https://aistudiocdn.com/lucide-react@^0.555.0",
+    "react/": "https://aistudiocdn.com/react@^19.2.0/",
+    "react": "https://aistudiocdn.com/react@^19.2.0",
+    "react-dom/": "https://aistudiocdn.com/react-dom@^19.2.0/"
+  }
+}
+</script>
+</head>
+<body class="text-gray-900 bg-black min-h-screen">
+
+    <!-- APP CONTAINER -->
+    <div id="app" class="relative w-full h-screen overflow-hidden">
+
+        <!-- VIEW: WELCOME SCREEN -->
+        <div id="welcome-view" class="h-full w-full flex flex-col items-center justify-center bg-zinc-900 text-white relative overflow-hidden cursor-pointer">
+            
+            <!-- Background -->
+            <div class="absolute inset-0 z-0 pointer-events-none">
+                <img 
+                  src="https://scontent.ftpe7-1.fna.fbcdn.net/v/t39.30808-6/522695106_122114261942935730_6218063499924590000_n.jpg?_nc_cat=110&ccb=1-7&_nc_sid=cc71e4&_nc_ohc=0-nHz2mmVn4Q7kNvwFWUX01&_nc_oc=AdkHpoOBLrxKivE7uCFnmQV8itOftMhKfm7myO9Ff_hm2dGFyeZLRItKFJ5Emyr46pc&_nc_zt=23&_nc_ht=scontent.ftpe7-1.fna&_nc_gid=h3Ly8d64C-Gq5zyKAF8kbQ&oh=00_AfkWXGhLOshpboOPnaxE5hXLUHtgtW9zBnkfdxB8Mt7Jsw&oe=693481B8" 
+                  alt="Salon Background" 
+                  class="w-full h-full object-cover opacity-40 animate-slow-pan"
+                />
+                <div class="absolute inset-0 bg-gradient-to-t from-black via-transparent to-black/60"></div>
+            </div>
+
+            <!-- Main Content -->
+            <div class="z-10 flex flex-col items-center text-center p-8 space-y-10 md:space-y-12 animate-fade-in-up w-full max-w-4xl pointer-events-none">
+                
+                <!-- Logo -->
+                <div class="bg-white p-2 rounded-full shadow-2xl animate-fade-in ring-8 ring-white/10 backdrop-blur-sm">
+                    <div class="w-56 h-56 md:w-80 md:h-80 rounded-full overflow-hidden">
+                        <img 
+                          id="welcome-logo"
+                          src="" 
+                          alt="Salon Logo" 
+                          class="w-full h-full object-cover transition-transform duration-700"
+                          style="transform: scale(1.3)"
+                        />
+                    </div>
+                </div>
+                
+                <div class="space-y-6">
+                    <h1 class="text-6xl md:text-8xl font-light tracking-tight text-white drop-shadow-lg">
+                        歡迎光臨
+                    </h1>
+                    <p class="text-2xl md:text-3xl text-gray-300 font-light tracking-[0.2em] uppercase drop-shadow-md">
+                        WELCOME TO FUNSONG
+                    </p>
+                </div>
+
+                <!-- Start Button (Visual only, click handled by container) -->
+                <div class="mt-12 group relative pointer-events-auto">
+                    <button 
+                        id="start-btn"
+                        class="flex items-center gap-6 px-16 py-8 bg-gradient-to-r from-white via-gray-100 to-white text-black rounded-full text-3xl font-medium tracking-wide transition-all duration-300 transform group-hover:scale-105 group-hover:shadow-[0_0_50px_rgba(255,255,255,0.4)] animate-button-complex shadow-2xl"
+                    >
+                        開始預約
+                        <span class="text-base uppercase opacity-60 font-semibold tracking-wider">Tap to Start</span>
+                        <!-- ChevronRight Icon -->
+                        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="ml-2"><path d="m9 18 6-6-6-6"/></svg>
+                    </button>
+                </div>
+
+                <p class="text-xl md:text-3xl text-white/90 font-light tracking-widest mt-4">
+                    電話: 036662366
+                </p>
+            </div>
+
+            <!-- Instruction Text -->
+            <div class="absolute bottom-40 md:bottom-12 z-10 text-white/40 text-lg md:text-xl pointer-events-none font-light tracking-wider">
+                請點擊螢幕開始預約
+            </div>
+
+            <!-- Website QR -->
+            <div class="absolute bottom-6 left-6 md:bottom-10 md:left-10 z-30 flex flex-col items-center bg-zinc-900/80 backdrop-blur-xl p-4 md:p-5 rounded-2xl border border-white/20 shadow-2xl cursor-auto transition-transform hover:scale-105 pointer-events-auto" onclick="event.stopPropagation()">
+                <span class="text-xs md:text-sm text-white/90 mb-3 font-light tracking-wider uppercase">官方網站</span>
+                <div class="bg-white p-2 rounded-xl">
+                    <img id="website-qr" src="" alt="Website QR Code" class="w-24 h-24 md:w-32 md:h-32 object-contain" />
+                </div>
+            </div>
+
+            <!-- Line QR -->
+            <div class="absolute bottom-6 right-6 md:bottom-10 md:right-10 z-30 flex flex-col items-center bg-zinc-900/80 backdrop-blur-xl p-4 md:p-5 rounded-2xl border border-white/20 shadow-2xl cursor-auto transition-transform hover:scale-105 pointer-events-auto" onclick="event.stopPropagation()">
+                <span class="text-xs md:text-sm text-white/90 mb-3 font-light tracking-wider uppercase">線上客服諮詢</span>
+                <div class="bg-white p-2 rounded-xl">
+                    <img id="line-qr" src="" alt="LINE QR Code" class="w-24 h-24 md:w-32 md:h-32 object-contain" />
+                </div>
+            </div>
+        </div>
+
+        <!-- VIEW: BOOKING KIOSK -->
+        <div id="booking-view" class="h-full w-full flex flex-col bg-gray-100 relative hidden">
+            
+            <!-- Top Nav -->
+            <div class="bg-zinc-900 text-white px-8 py-6 flex items-center justify-between shadow-lg z-20 shrink-0">
+                <div class="flex items-center gap-6">
+                    <img id="kiosk-logo" src="" alt="Logo" class="w-14 h-14 rounded-full object-contain bg-white border-2 border-white/20 shadow-md"/>
+                    <span class="font-light tracking-widest text-2xl hidden md:block text-gray-100">自助預約服務</span>
+                </div>
+                
+                <div class="flex items-center gap-6">
+                    <button id="refresh-btn" class="flex items-center gap-3 px-6 py-3 rounded-xl hover:bg-white/10 text-white/80 hover:text-white transition-colors text-lg">
+                        <!-- RefreshCw Icon -->
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M3 21v-5h5"/></svg>
+                        <span class="hidden sm:inline">重新整理</span>
+                    </button>
+                    
+                    <button id="reset-btn" class="flex items-center gap-3 px-8 py-4 bg-white text-black rounded-full hover:bg-gray-100 transition-all font-medium shadow-xl active:scale-95 transform duration-150 text-lg tracking-wide border-2 border-transparent hover:border-gray-200">
+                        <!-- CheckCircle Icon -->
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="M22 4 12 14.01l-3-3"/></svg>
+                        <span>完成 / 回首頁</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Iframe Container -->
+            <div class="flex-1 w-full relative bg-white overflow-hidden shadow-inner">
+                <iframe
+                  id="booking-iframe"
+                  src=""
+                  title="Booking Interface"
+                  class="absolute top-0 left-0 border-0"
+                  style="width: 80%; height: 80%; transform: scale(1.25); transform-origin: 0 0; will-change: transform;"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  sandbox="allow-same-origin allow-scripts allow-forms allow-popups allow-modals"
+                ></iframe>
+            </div>
+
+            <!-- Bottom Floating Status -->
+            <div class="absolute bottom-8 left-1/2 -translate-x-1/2 z-30 pointer-events-none w-full flex flex-col items-center gap-3 px-4">
+                
+                <!-- Instruction Badge (Updated: Black 45% opacity) -->
+                <div class="bg-zinc-900/45 backdrop-blur-sm text-white px-6 py-3 rounded-2xl text-lg font-medium shadow-[0_4px_20px_rgba(0,0,0,0.3)] flex items-center gap-3 border border-white/20 transform transition-all">
+                    <div class="bg-white text-zinc-900 p-1.5 rounded-full shrink-0">
+                         <!-- CheckCircle Icon -->
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="M22 4 12 14.01l-3-3"/></svg>
+                    </div>
+                    <span class="tracking-wide text-shadow-sm">
+                      預約完成後 請點擊右上角 <span class="font-bold text-yellow-400 mx-1 border-b border-yellow-400/50">完成</span> 返回首頁
+                    </span>
+                </div>
+
+                <!-- Idle Timer Badge -->
+                <div class="bg-black/50 backdrop-blur-md text-white/90 px-5 py-2 rounded-full text-sm font-light shadow-lg flex items-center gap-2 border border-white/10">
+                    <!-- Clock Icon -->
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-yellow-400"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                    <span id="idle-text">系統將在閒置 3 分鐘後自動返回</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- APPLICATION LOGIC -->
+    <script>
+        // --- CONSTANTS ---
+        const BOOKING_URL = "https://booking.saydou.com/google/3428/4017/appointment/new?hl=zh-TW&gei=qEHvaLL8O_K4vr0Poo-lgAI&rwg_token=ACgRB3exVD1BRyPlO46nTi9L8v1erlDNwy3MElLB5ZXqy81NwcBDpkhraY6ZV0Hc98UjBd9Y5aJZNZbRJ_iV-wSS5KYp_SoKIQ%3D%3D";
+        const LOGO_URL = "https://scontent.ftpe7-3.fna.fbcdn.net/v/t39.30808-6/517920843_122103415412935730_6802821090112916897_n.jpg?_nc_cat=102&ccb=1-7&_nc_sid=6ee11a&_nc_ohc=cPgcppkzIrYQ7kNvwGOie-P&_nc_oc=AdlSHu-bEkfRDBmdNBY6IAnHsABZMqeABbmQ2_3OBfIjB7jEz9XNmHqA4lEscA0lBkU&_nc_zt=23&_nc_ht=scontent.ftpe7-3.fna&_nc_gid=PQOeO_FOSgXpuA4thmpqUg&oh=00_AfmRGrdzbh-uwbd3X5Y3tmtzV3ixeyj7OeT70kRFuT6JSg&oe=693483A0";
+        const LINE_QR_URL = "https://scontent.ftpe7-1.fna.fbcdn.net/v/t39.30808-6/515490481_122095840550935730_2101160971516645767_n.jpg?_nc_cat=100&ccb=1-7&_nc_sid=833d8c&_nc_ohc=pueIH2a27ZYQ7kNvwE8UCz7&_nc_oc=AdlhcmI4kuTSx6h4sPEZGinEn_tgh-lzRWBDmPnYjMAlSCynCHzPY0aC3wZeGZ8LRqY&_nc_zt=23&_nc_ht=scontent.ftpe7-1.fna&_nc_gid=tVExvFY2NqUfm9Sk2WgRFA&oh=00_AflqnCc2ObeizkTgzYK5uU2At8KXQiX5DywZa6QJkluRSw&oe=693482F0";
+        const WEBSITE_URL = "https://www.funsongspa.com";
+        const WEBSITE_QR_URL = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(WEBSITE_URL)}`;
+        const IDLE_TIMEOUT_SECONDS = 180;
+
+        // --- DOM ELEMENTS ---
+        const welcomeView = document.getElementById('welcome-view');
+        const bookingView = document.getElementById('booking-view');
+        const bookingIframe = document.getElementById('booking-iframe');
+        const idleText = document.getElementById('idle-text');
+
+        // --- INITIALIZATION ---
+        // Set images
+        document.getElementById('welcome-logo').src = LOGO_URL;
+        document.getElementById('kiosk-logo').src = LOGO_URL;
+        document.getElementById('line-qr').src = LINE_QR_URL;
+        document.getElementById('website-qr').src = WEBSITE_QR_URL;
+        
+        // Update idle text initial state
+        idleText.textContent = `系統將在閒置 ${Math.floor(IDLE_TIMEOUT_SECONDS / 60)} 分鐘後自動返回`;
+
+        // --- STATE MANAGEMENT ---
+        let appState = 'WELCOME'; // 'WELCOME' | 'BOOKING'
+
+        function switchToBooking() {
+            appState = 'BOOKING';
+            welcomeView.classList.add('hidden');
+            bookingView.classList.remove('hidden');
+            
+            // Load iframe
+            if (bookingIframe.src !== BOOKING_URL) {
+                bookingIframe.src = BOOKING_URL;
+            }
+
+            startIdleTimer();
+        }
+
+        function switchToWelcome() {
+            appState = 'WELCOME';
+            bookingView.classList.add('hidden');
+            welcomeView.classList.remove('hidden');
+            
+            // Unload iframe to reset state and stop audio/video if any
+            bookingIframe.src = "";
+            
+            stopIdleTimer();
+        }
+
+        // --- EVENT LISTENERS ---
+        
+        // Welcome Screen click (anywhere)
+        welcomeView.addEventListener('click', (e) => {
+            // Prevent triggering if clicking specific interactive elements that handle their own propagation
+            // (Handled via inline onclick="event.stopPropagation()" in HTML)
+            switchToBooking();
+        });
+
+        // Start Button specific click (redundant but safe)
+        document.getElementById('start-btn').addEventListener('click', (e) => {
+            e.stopPropagation();
+            switchToBooking();
+        });
+
+        // Reset / Home Button
+        document.getElementById('reset-btn').addEventListener('click', () => {
+            switchToWelcome();
+        });
+
+        // Refresh Button
+        document.getElementById('refresh-btn').addEventListener('click', () => {
+            // Force reload iframe
+            const currentSrc = bookingIframe.src;
+            bookingIframe.src = currentSrc;
+        });
+
+        // --- IDLE TIMER LOGIC ---
+        let idleTimer = null;
+
+        function resetTimer() {
+            if (idleTimer) {
+                clearTimeout(idleTimer);
+            }
+            if (appState === 'BOOKING') {
+                idleTimer = setTimeout(() => {
+                    console.log('Idle timeout reached, resetting...');
+                    switchToWelcome();
+                }, IDLE_TIMEOUT_SECONDS * 1000);
+            }
+        }
+
+        function startIdleTimer() {
+            const events = ['mousedown', 'mousemove', 'keypress', 'scroll', 'touchstart', 'click'];
+            
+            // Remove existing listeners first to avoid duplicates
+            events.forEach(event => {
+                window.removeEventListener(event, resetTimer, true);
+            });
+
+            // Add listeners
+            events.forEach(event => {
+                window.addEventListener(event, resetTimer, true);
+            });
+
+            resetTimer(); // Start the first timer
+        }
+
+        function stopIdleTimer() {
+            if (idleTimer) {
+                clearTimeout(idleTimer);
+                idleTimer = null;
+            }
+            // Cleanup listeners
+            const events = ['mousedown', 'mousemove', 'keypress', 'scroll', 'touchstart', 'click'];
+            events.forEach(event => {
+                window.removeEventListener(event, resetTimer, true);
+            });
+        }
+
+    </script>
+</body>
+</html>
