@@ -4,33 +4,19 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
     
-    <!-- iOS / Android Kiosk Meta Tags -->
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <meta name="mobile-web-app-capable" content="yes" />
     <meta name="theme-color" content="#000000" />
     
     <title>方崧預約系統</title>
+    
     <link rel="icon" href="https://scontent.ftpe7-3.fna.fbcdn.net/v/t39.30808-6/517920843_122103415412935730_6802821090112916897_n.jpg?_nc_cat=102&ccb=1-7&_nc_sid=6ee11a&_nc_ohc=cPgcppkzIrYQ7kNvwGOie-P&_nc_oc=AdlSHu-bEkfRDBmdNBY6IAnHsABZMqeABbmQ2_3OBfIjB7jEz9XNmHqA4lEscA0lBkU&_nc_zt=23&_nc_ht=scontent.ftpe7-3.fna&_nc_gid=PQOeO_FOSgXpuA4thmpqUg&oh=00_AfmRGrdzbh-uwbd3X5Y3tmtzV3ixeyj7OeT70kRFuT6JSg&oe=693483A0" type="image/jpeg">
     
-    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     
-    <!-- ★★★ 預約網址設定區 ★★★ -->
-    <script>
-      window.bookingConfig = {
-        // 更新日期: 2025-05-xx
-        // 注意：此連結含有 token，若過期需再次更新
-        //
-        // 【技術說明】無法設定先連結到 Google Maps (https://maps.app.goo.gl/...)
-        // 原因：Google Maps 有資安限制 (X-Frame-Options: SAMEORIGIN)，禁止被嵌入在網站或 Kiosk 的 iframe 中。
-        // 強制嵌入會導致畫面空白。因此必須直接使用下方的 SayDou 預約頁面連結。
-        url: "https://booking.saydou.com/google/3428/4017/appointment/new?hl=zh-TW&gei=1cIyaculCYiOosUP3baa2Qs&rwg_token=ACgRB3f6xbX2dBL84Jrm-E6ViYGLrqwimuv6qvuebY-JaVk2nb0u_60qVi8ig42lKd3K74w9PcOxhVupcb7ht7Ex8YxgA-SL5g%3D%3D"
-      };
-    </script>
-    <!-- ★★★ 設定結束 ★★★ -->
-
     <style>
+      /* 基礎 Kiosk 設定 */
       html, body {
         width: 100%;
         height: 100%;
@@ -43,43 +29,9 @@
         user-select: none;
         -webkit-user-select: none;
         -webkit-tap-highlight-color: transparent;
-        touch-action: pan-x pan-y;
       }
-      #root { width: 100%; height: 100%; }
-      
-      @keyframes slow-pan {
-        0% { transform: scale(1.1) translate(0, 0); }
-        100% { transform: scale(1.2) translate(-2%, -2%); }
-      }
-      @keyframes breathe {
-        0%, 100% { transform: scale(1); box-shadow: 0 0 0 rgba(255,255,255,0); }
-        50% { transform: scale(1.03); box-shadow: 0 0 30px rgba(255,255,255,0.5); }
-      }
-      @keyframes fade-in-up {
-        0% { opacity: 0; transform: translateY(30px); }
-        100% { opacity: 1; transform: translateY(0); }
-      }
-      .animate-slow-pan { animation: slow-pan 20s ease-in-out infinite alternate; }
-      .animate-fade-in-up { animation: fade-in-up 1s ease-out forwards; }
-      .btn-glow { animation: breathe 3s infinite; }
-    </style>
 
-    <script type="importmap">
-    {
-      "imports": {
-        "react": "https://aistudiocdn.com/react@^19.2.1",
-        "react-dom/": "https://aistudiocdn.com/react-dom@^19.2.1/",
-        "react/": "https://aistudiocdn.com/react@^19.2.1/",
-        "lucide-react": "https://aistudiocdn.com/lucide-react@^0.555.0"
-      }
-    }
-    </script>
-</head>
-<body class="bg-black text-white">
-    <div id="root"></div>
-    <script type="module" src="/index.tsx"></script>
-</body>
-</html>
+      /* 動畫特效 */
       @keyframes slow-pan {
         0% { transform: scale(1.1) translate(0, 0); }
         100% { transform: scale(1.2) translate(-2%, -2%); }
@@ -101,6 +53,7 @@
 <body class="bg-black text-white h-screen w-screen overflow-hidden">
 
     <div id="app" class="relative w-full h-full">
+
         <div id="welcome-view" class="absolute inset-0 z-10 flex flex-col items-center justify-center bg-zinc-900 cursor-pointer">
             
             <div class="absolute inset-0 overflow-hidden opacity-40">
@@ -142,17 +95,20 @@
     </div>
 
     <script>
+        // 設定點擊後要跳轉的網址 (方崧官網聯絡頁)
         const BOOKING_URL = "https://www.funsongspa.com/paper/contact_index.php";
         
         function startBooking() {
             window.location.href = BOOKING_URL;
         }
 
+        // 綁定按鈕點擊
         document.getElementById('start-btn').onclick = (e) => { 
             e.stopPropagation(); 
             startBooking(); 
         };
         
+        // 綁定點擊螢幕任意處也能開始
         document.getElementById('welcome-view').onclick = () => {
             startBooking();
         };
