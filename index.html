@@ -2,20 +2,40 @@
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+    
+    <!-- iOS / Android Kiosk Meta Tags (讓網頁更像 App，防止瀏覽器選單跳出) -->
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="theme-color" content="#000000" />
+    
     <title>方崧預約系統</title>
     <link rel="icon" href="https://scontent.ftpe7-3.fna.fbcdn.net/v/t39.30808-6/517920843_122103415412935730_6802821090112916897_n.jpg?_nc_cat=102&ccb=1-7&_nc_sid=6ee11a&_nc_ohc=cPgcppkzIrYQ7kNvwGOie-P&_nc_oc=AdlSHu-bEkfRDBmdNBY6IAnHsABZMqeABbmQ2_3OBfIjB7jEz9XNmHqA4lEscA0lBkU&_nc_zt=23&_nc_ht=scontent.ftpe7-3.fna&_nc_gid=PQOeO_FOSgXpuA4thmpqUg&oh=00_AfmRGrdzbh-uwbd3X5Y3tmtzV3ixeyj7OeT70kRFuT6JSg&oe=693483A0" type="image/jpeg">
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
+      /* 基礎設定 & Kiosk 優化 */
       body {
-        overscroll-behavior-y: contain;
+        overscroll-behavior-y: none; /* 禁止下拉重整，防止畫面跳動 */
         background-color: #000;
         user-select: none;
         -webkit-user-select: none;
+        -webkit-tap-highlight-color: transparent; /* 移除點擊高亮 */
         font-family: system-ui, -apple-system, sans-serif;
         margin: 0;
+        padding: 0;
+        width: 100vw;
+        height: 100vh;
+        overflow: hidden; /* 防止捲動 */
+        touch-action: none; /* 停用預設觸控行為，防止縮放 */
       }
       
+      #root {
+        width: 100%;
+        height: 100%;
+      }
+      
+      /* 動畫特效 */
       @keyframes slow-pan {
         0% { transform: scale(1.1) translate(0, 0); }
         100% { transform: scale(1.2) translate(-2%, -2%); }
@@ -33,68 +53,19 @@
       .animate-fade-in-up { animation: fade-in-up 1s ease-out forwards; }
       .btn-glow { animation: breathe 3s infinite; }
     </style>
+<script type="importmap">
+{
+  "imports": {
+    "react": "https://aistudiocdn.com/react@^19.2.1",
+    "react-dom/": "https://aistudiocdn.com/react-dom@^19.2.1/",
+    "react/": "https://aistudiocdn.com/react@^19.2.1/",
+    "lucide-react": "https://aistudiocdn.com/lucide-react@^0.555.0"
+  }
+}
+</script>
 </head>
 <body class="bg-black text-white h-screen w-screen overflow-hidden">
-
-    <div id="app" class="relative w-full h-full">
-        <div id="welcome-view" class="absolute inset-0 z-10 flex flex-col items-center justify-center bg-zinc-900 cursor-pointer">
-            
-            <!-- 背景圖片 -->
-            <div class="absolute inset-0 overflow-hidden opacity-40">
-                <img src="https://scontent.ftpe7-1.fna.fbcdn.net/v/t39.30808-6/522695106_122114261942935730_6218063499924590000_n.jpg?_nc_cat=110&ccb=1-7&_nc_sid=cc71e4&_nc_ohc=0-nHz2mmVn4Q7kNvwFWUX01&_nc_oc=AdkHpoOBLrxKivE7uCFnmQV8itOftMhKfm7myO9Ff_hm2dGFyeZLRItKFJ5Emyr46pc&_nc_zt=23&_nc_ht=scontent.ftpe7-1.fna&_nc_gid=h3Ly8d64C-Gq5zyKAF8kbQ&oh=00_AfkWXGhLOshpboOPnaxE5hXLUHtgtW9zBnkfdxB8Mt7Jsw&oe=693481B8" 
-                     class="w-full h-full object-cover animate-slow-pan" alt="背景" />
-            </div>
-            
-            <!-- 主要內容 -->
-            <div class="z-20 flex flex-col items-center text-center animate-fade-in-up px-4">
-                <div class="w-48 h-48 md:w-64 md:h-64 rounded-full bg-white p-2 mb-8 shadow-2xl ring-4 md:ring-8 ring-white/10">
-                    <img src="https://scontent.ftpe7-3.fna.fbcdn.net/v/t39.30808-6/517920843_122103415412935730_6802821090112916897_n.jpg?_nc_cat=102&ccb=1-7&_nc_sid=6ee11a&_nc_ohc=cPgcppkzIrYQ7kNvwGOie-P&_nc_oc=AdlSHu-bEkfRDBmdNBY6IAnHsABZMqeABbmQ2_3OBfIjB7jEz9XNmHqA4lEscA0lBkU&_nc_zt=23&_nc_ht=scontent.ftpe7-3.fna&_nc_gid=PQOeO_FOSgXpuA4thmpqUg&oh=00_AfmRGrdzbh-uwbd3X5Y3tmtzV3ixeyj7OeT70kRFuT6JSg&oe=693483A0" 
-                         class="w-full h-full object-cover rounded-full" alt="方崧 Logo" />
-                </div>
-                
-                <h1 class="text-5xl md:text-7xl font-light tracking-wide mb-4 drop-shadow-lg">歡迎光臨</h1>
-                <p class="text-xl md:text-2xl text-gray-300 tracking-[0.3em] uppercase mb-12">Welcome to Funsong</p>
-                
-                <button id="start-btn" class="btn-glow px-10 py-5 md:px-16 md:py-6 bg-white text-black text-2xl md:text-3xl font-bold rounded-full shadow-[0_0_30px_rgba(255,255,255,0.3)] flex items-center gap-4 hover:scale-105 transition-transform">
-                    開始預約 <span class="text-sm font-normal text-gray-500 hidden md:inline">TAP TO START</span>
-                </button>
-                
-                <p class="mt-8 text-lg md:text-xl tracking-widest text-white/80">電話: 03-666-2366</p>
-            </div>
-
-            <!-- 底部 QR Code -->
-            <div class="absolute bottom-8 left-0 w-full z-30 flex flex-col md:flex-row justify-center items-center space-y-6 md:space-y-0 md:space-x-12 px-8 pointer-events-none">
-                <div class="bg-zinc-900/80 p-4 rounded-xl border border-white/20 backdrop-blur-md text-center w-48 md:w-auto pointer-events-auto">
-                    <p class="text-xs text-gray-300 mb-2">官方網站</p>
-                    <div class="bg-white p-2 rounded-lg flex justify-center">
-                        <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=https://www.funsongspa.com" class="w-24 h-24 md:w-28 md:h-28" alt="官網 QR Code" />
-                    </div>
-                </div>
-                <div class="bg-zinc-900/80 p-4 rounded-xl border border-white/20 backdrop-blur-md text-center w-48 md:w-auto pointer-events-auto">
-                    <p class="text-xs text-gray-300 mb-2">線上客服諮詢</p>
-                    <div class="bg-white p-2 rounded-lg flex justify-center">
-                        <img src="https://scontent.ftpe7-1.fna.fbcdn.net/v/t39.30808-6/515490481_122095840550935730_2101160971516645767_n.jpg?_nc_cat=100&ccb=1-7&_nc_sid=833d8c&_nc_ohc=pueIH2a27ZYQ7kNvwE8UCz7&_nc_oc=AdlhcmI4kuTSx6h4sPEZGinEn_tgh-lzRWBDmPnYjMAlSCynCHzPY0aC3wZeGZ8LRqY&_nc_zt=23&_nc_ht=scontent.ftpe7-1.fna&_nc_gid=tVExvFY2NqUfm9Sk2WgRFA&oh=00_AflqnCc2ObeizkTgzYK5uU2At8KXQiX5DywZa6QJkluRSw&oe=693482F0" class="w-24 h-24 md:w-28 md:h-28" alt="LINE QR Code" />
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <script>
-        const BOOKING_URL = "https://booking.saydou.com/google/3428/4017/appointment/new?hl=zh-TW";
-        
-        function startBooking() {
-            window.location.href = BOOKING_URL;
-        }
-
-        document.getElementById('start-btn').onclick = (e) => { 
-            e.stopPropagation(); 
-            startBooking(); 
-        };
-        
-        document.getElementById('welcome-view').onclick = () => {
-            startBooking();
-        };
-    </script>
+    <div id="root"></div>
+    <script type="module" src="/index.tsx"></script>
 </body>
 </html>
